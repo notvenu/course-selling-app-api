@@ -11,13 +11,7 @@ const courseSchema = new Schema({
     description: {
         type: String,
         required: true,
-        trim: true,
-        validate: {
-            validator: function (v) {
-                return v.trim().split(/\s+/).length <= 100;
-            },
-            message: props => `Description exceeds 100 words! You entered "${props.value}".`
-        }
+        trim: true
     },
     price: {
         type: Number,
