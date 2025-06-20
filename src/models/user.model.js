@@ -3,11 +3,17 @@ import bcrpyt from "bcrypt"
 import jwt from "jsonwebtoken"
 
 const userSchema = new Schema({
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        index: true
+    },
     name: {
         type: String,
         required: [true, "Name is required"],
         trim: true,
-        index: true
     },
     email: {
         type: String,
@@ -22,8 +28,12 @@ const userSchema = new Schema({
     },
     role: {
         type: String,
-        enum: ["student", "instructor"],
+        enum: ["Student", "Instructor"],
         default: "student"
+    },
+    watchHistory: {
+        type: Schema.Types.ObjectId,
+        ref: "lesson"
     },
     refreshToken: {
         type: String,

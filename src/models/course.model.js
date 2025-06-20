@@ -27,15 +27,15 @@ const courseSchema = new Schema({
         type: String, //Cloudinary URL
         default: ""
     },
-    instructorId: {
+    instructor: {
         type: Schema.Types.ObjectId,
-        ref: "user"
+        ref: "instructor"
     },
     published: {
         type: Boolean,
         default: false
     },
-    categoryId: {
+    category: {
         type: Schema.Types.ObjectId,
         ref: "category"
     }

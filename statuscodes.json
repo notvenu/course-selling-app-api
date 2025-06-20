@@ -1,0 +1,222 @@
+{
+  "informational": [
+    {
+      "code": "REQUEST_RECEIVED",
+      "status": 100,
+      "message": "Request has been received and is continuing to process."
+    },
+    {
+      "code": "SWITCHING_PROTOCOLS",
+      "status": 101,
+      "message": "Server is switching protocols as requested."
+    }
+  ],
+  "success": [
+    {
+      "code": "OK",
+      "status": 200,
+      "message": "The request has succeeded."
+    },
+    {
+      "code": "CREATED",
+      "status": 201,
+      "message": "The resource has been created successfully."
+    },
+    {
+      "code": "ACCEPTED",
+      "status": 202,
+      "message": "The request has been accepted for processing."
+    },
+    {
+      "code": "NO_CONTENT",
+      "status": 204,
+      "message": "The request was successful, but no content is returned."
+    }
+  ],
+  "redirection": [
+    {
+      "code": "MOVED_PERMANENTLY",
+      "status": 301,
+      "message": "The resource has moved permanently to a new URI."
+    },
+    {
+      "code": "FOUND",
+      "status": 302,
+      "message": "The resource has been temporarily moved to a different URI."
+    },
+    {
+      "code": "NOT_MODIFIED",
+      "status": 304,
+      "message": "The resource has not been modified since the last request."
+    }
+  ],
+  "client_errors": [
+    {
+      "code": "USER_INVALID_INPUT",
+      "status": 400,
+      "message": "Field is invalid."
+    },
+    {
+      "code": "AUTH_INVALID_CREDENTIALS",
+      "status": 401,
+      "message": "Incorrect fields."
+    },
+    {
+      "code": "AUTH_FORBIDDEN_ROLE",
+      "status": 403,
+      "message": "User role does not have required permissions."
+    },
+    {
+      "code": "USER_NOT_FOUND",
+      "status": 404,
+      "message": "User with given ID not found."
+    },
+    {
+      "code": "USER_ALREADY_EXISTS",
+      "status": 409,
+      "message": "Field already in use."
+    },
+    {
+      "code": "COURSE_NOT_FOUND",
+      "status": 404,
+      "message": "Course not found with provided ID."
+    },
+    {
+      "code": "COURSE_INVALID_DATA",
+      "status": 400,
+      "message": "Invalid course title, description or price."
+    },
+    {
+      "code": "COURSE_NOT_PUBLISHED",
+      "status": 403,
+      "message": "Course is not yet published."
+    },
+    {
+      "code": "COURSE_DUPLICATE_TITLE",
+      "status": 409,
+      "message": "Course with this title already exists."
+    },
+    {
+      "code": "INSTRUCTOR_NOT_FOUND",
+      "status": 404,
+      "message": "Instructor user not found."
+    },
+    {
+      "code": "INSTRUCTOR_INVALID_ASSIGNMENT",
+      "status": 400,
+      "message": "Instructor can't be assigned to this course."
+    },
+    {
+      "code": "ORDER_NOT_FOUND",
+      "status": 404,
+      "message": "Order not found with given ID."
+    },
+    {
+      "code": "ORDER_INVALID_ITEMS",
+      "status": 400,
+      "message": "Items array is invalid or empty."
+    },
+    {
+      "code": "PAYMENT_NOT_FOUND",
+      "status": 404,
+      "message": "Payment not found for this order."
+    },
+    {
+      "code": "PAYMENT_REQUIRED",
+      "status": 402,
+      "message": "Payment is required to access the course."
+    },
+    {
+      "code": "PAYMENT_ALREADY_DONE",
+      "status": 409,
+      "message": "This course has already been paid for."
+    },
+    {
+      "code": "PAYMENT_INVALID_METHOD",
+      "status": 422,
+      "message": "Provided payment method is not supported."
+    },
+    {
+      "code": "ENROLLMENT_NOT_FOUND",
+      "status": 404,
+      "message": "No enrollment found for user and course."
+    },
+    {
+      "code": "ENROLLMENT_ALREADY_EXISTS",
+      "status": 409,
+      "message": "Already enrolled in this course."
+    },
+    {
+      "code": "ENROLLMENT_FORBIDDEN",
+      "status": 403,
+      "message": "Cannot enroll in unpublished/private course."
+    },
+    {
+      "code": "REVIEW_NOT_FOUND",
+      "status": 404,
+      "message": "Review does not exist."
+    },
+    {
+      "code": "REVIEW_INVALID_RATING",
+      "status": 400,
+      "message": "Rating must be between 1 to 5."
+    },
+    {
+      "code": "REVIEW_NOT_ALLOWED",
+      "status": 403,
+      "message": "Cannot review a course you're not enrolled in."
+    },
+    {
+      "code": "MODULE_NOT_FOUND",
+      "status": 404,
+      "message": "Module not found in course."
+    },
+    {
+      "code": "LESSON_NOT_FOUND",
+      "status": 404,
+      "message": "Lesson not found in module."
+    },
+    {
+      "code": "LESSON_INVALID_POSITION",
+      "status": 400,
+      "message": "Lesson position must be a valid integer."
+    },
+    {
+      "code": "CATEGORY_NOT_FOUND",
+      "status": 404,
+      "message": "Course category not found."
+    },
+    {
+      "code": "CATEGORY_ALREADY_EXISTS",
+      "status": 409,
+      "message": "Category with this name already exists."
+    }
+  ],
+  "server_errors": [
+    {
+      "code": "INTERNAL_SERVER_ERROR",
+      "status": 500,
+      "message": "An unexpected error occurred on the server."
+    },
+    {
+      "code": "SERVICE_UNAVAILABLE",
+      "status": 503,
+      "message": "The server is currently unavailable (overloaded or down)."
+    },
+    {
+      "code": "GATEWAY_TIMEOUT",
+      "status": 504,
+      "message": "The server did not receive a timely response from an upstream server."
+    },
+    {
+      "code": "NOT_IMPLEMENTED",
+      "status": 501,
+      "message": "The requested feature is not implemented by the server."
+    },
+    {
+      "code": "BAD_GATEWAY",
+      "status": 502,
+      "message": "The server received an invalid response from the upstream server."
+    }
+  ]
+}
