@@ -1,6 +1,7 @@
 import { isValidObjectId } from "mongoose"
 import { options } from "../constants.js"
 import { User } from "../models/user.model.js"
+import { Enrollment } from "../models/enrollment.model.js"
 import { asyncHandler } from "../utils/asyncHandler.util.js"
 import { apiError } from "../utils/apiError.util.js"
 import { apiResponse } from "../utils/apiResponse.util.js"
@@ -358,6 +359,133 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     )
 })
 
+const getUserWatchHistory = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+  if (!isValidObjectId(userId)) {
+    throw new apiError(400, "Invalid user ID.");
+  }
+  const user = await User.aggregate([
+    {
+      $match: { _id: new mongoose.Types.ObjectId(userId) }
+    },
+    {
+      $lookup: {
+        from: "lessons",
+        localField: "watchHistory",
+        foreignField: "_id",
+        as: "watchHistory",
+        pipeline: [
+          {
+            $lookup: {
+              from: "courses",
+              localField: "course",
+              foreignField: "_id",
+              as: "courseInfo",
+              pipeline: [
+                {
+                  $lookup: {
+                    from: "instructors",
+                    localField: "_id",
+                    foreignField: "courses",
+                    as: "instructorMap"
+                  }
+                },
+                {
+                  $unwind: {
+                    path: "$instructorMap",
+                    preserveNullAndEmptyArrays: true
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "users",
+                    localField: "instructorMap.user_id",
+                    foreignField: "_id",
+                    as: "instructorDetails",
+                    pipeline: [
+                      { $project: { name: 1 } }
+                    ]
+                  }
+                },
+                {
+                  $unwind: {
+                    path: "$instructorDetails",
+                    preserveNullAndEmptyArrays: true
+                  }
+                },
+                {
+                  $project: {
+                    title: 1,
+                    thumbnail_url: 1,
+                    instructorName: "$instructorDetails.name"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            $unwind: {
+              path: "$courseInfo",
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $project: {
+              _id: 1,
+              title: 1,
+              video_url: 1,
+              completed: 1,
+              courseName: "$courseInfo.title",
+              courseThumbnail: "$courseInfo.thumbnail_url",
+              instructorName: "$courseInfo.instructorName",
+              lessonName: "$title"
+            }
+          }
+        ]
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        username: 1,
+        watchHistory: 1
+      }
+    }
+  ]);
+
+  if (!user || user.length === 0) {
+    throw new apiError(404, "User not found.");
+  }
+
+  return res.status(200).json( new apiResponse(200, {user: user[0].name,username: user[0].username,watchHistory: user[0].watchHistory}, "Watch history fetched successfully.") )
+})
+
+const getUserProgress = asyncHandler(async (req, res) => {
+    const userId = req.user?._id
+    if(!isValidObjectId(userId)){
+        throw new apiError(400, "Invalid user id.")
+    }
+    const enrollments = await Enrollment.find({student: userId}).populate("course", "title thumbnail").populate("instructor", "name username")
+    if(!enrollments || enrollments.length === 0){
+        throw new apiError(404, "User is not enrolled in any course.")
+    }
+    const progressData = enrollments.map((enrollment) => {
+        return {
+            courseId: enrollment.course._id,
+            courseTitle: enrollment.course.title,
+            courseThumbnail: enrollment.course.thumbnail_url,
+            progress: parseFloat(enrollment.progress.toFixed(2)),
+            completed: enrollment.completed,
+            enrolledAt: enrollment.enrolled_at
+        }
+    })
+    if(!progressData){
+        throw new apiError(500, "Failed to fetch user progress data.")
+    }
+    return res.status(200).json(new apiResponse(200, { progressData }, "User progress data fetched successfully."))
+})
+
 const updateAccountDetails = asyncHandler(async (req, res) => {
     const { username, name, email } = req.body
     if( !(name || username || email ) ) {
@@ -405,144 +533,6 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     return res.status(200).json( new apiResponse(200, user, "User account details updated successfully.") )
 })
 
-const getUserWatchHistory = asyncHandler(async (req, res) => {
-    const userId = req.user?._id;
-    
-    if (!isValidObjectId(userId)) {
-        throw new apiError(400, "Invalid user id.");
-    }
-
-    const user = await User.aggregate([
-        {
-            $match: {
-                _id: new mongoose.Types.ObjectId(userId)
-            }
-        },
-        {
-            $lookup: {
-                from: "lessons",
-                localField: "watchHistory",
-                foreignField: "_id",
-                as: "watchHistory",
-                pipeline: [
-                    {
-                        $lookup: {
-                            from: "modules",
-                            localField: "module",
-                            foreignField: "_id",
-                            as: "moduleInfo",
-                            pipeline: [
-                                {
-                                    $lookup: {
-                                        from: "courses",
-                                        localField: "course",
-                                        foreignField: "_id",
-                                        as: "courseInfo",
-                                        pipeline: [
-                                            {
-                                                $lookup: {
-                                                    from: "instructors",
-                                                    localField: "_id",
-                                                    foreignField: "courses",
-                                                    as: "instructorMapping"
-                                                }
-                                            },
-                                            {
-                                                $unwind: {
-                                                    path: "$instructorMapping",
-                                                    preserveNullAndEmptyArrays: true
-                                                }
-                                            },
-                                            {
-                                                $lookup: {
-                                                    from: "users",
-                                                    localField: "instructorMapping.user_id",
-                                                    foreignField: "_id",
-                                                    as: "instructorDetails",
-                                                    pipeline: [
-                                                        {
-                                                            $project: {
-                                                                name: 1,
-                                                                username: 1,
-                                                                email: 1
-                                                            }
-                                                        }
-                                                    ]
-                                                }
-                                            },
-                                            {
-                                                $unwind: {
-                                                    path: "$instructorDetails",
-                                                    preserveNullAndEmptyArrays: true
-                                                }
-                                            },
-                                            {
-                                                $project: {
-                                                    title: 1,
-                                                    thumbnail_url: 1,
-                                                    instructor: "$instructorDetails"
-                                                }
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    $unwind: {
-                                        path: "$courseInfo",
-                                        preserveNullAndEmptyArrays: true
-                                    }
-                                },
-                                {
-                                    $project: {
-                                        title: 1,
-                                        course: "$courseInfo"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        $unwind: {
-                            path: "$moduleInfo",
-                            preserveNullAndEmptyArrays: true
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 1,
-                            title: 1,
-                            video_url: 1,
-                            position: 1,
-                            courseName: "$moduleInfo.course.title",
-                            courseThumbnail: "$moduleInfo.course.thumbnail_url",
-                            moduleName: "$moduleInfo.title",
-                            instructorName: "$moduleInfo.course.instructor.name",
-                            instructorUsername: "$moduleInfo.course.instructor.username",
-                            lessonName: "$title"
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            $project: {
-                _id: 1,
-                name: 1,
-                username: 1,
-                watchHistory: 1,
-                password: 0,
-                refreshToken: 0,
-            }
-        }
-    ]);
-
-    if (!user || user.length === 0) {
-        throw new apiError(404, "User not found.");
-    }
-
-    return res.status(200).json( new apiResponse(200, { user: user[0].name,username: user[0].username, watchHistory: user[0].watchHistory }, "Watch history fetched successfully.") )
-})
-
 const deleteUserAccount = asyncHandler(async (req, res) => {
     const userId = req.user?._id
     if(!isValidObjectId(userId)){
@@ -560,4 +550,4 @@ const deleteUserAccount = asyncHandler(async (req, res) => {
     return res.status(200).json( new apiResponse(200, {}, "User account deleted successfully."))
 })
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken, changePassword, getCurrentUser, updateAccountDetails, getUserWatchHistory, deleteUserAccount }
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changePassword, getCurrentUser, getUserWatchHistory, getUserProgress, updateAccountDetails, deleteUserAccount }

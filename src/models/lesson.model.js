@@ -19,18 +19,17 @@ const lessonSchema = new Schema({
             message: props => `Content exceeds 100 words! You entered "${props.value}".`
         }
     },
-    module: {
+    course: {
         type: Schema.Types.ObjectId,
-        ref: "module"
+        ref: "course"
     },
     videoFile: {
         type: String,
         required: true,
     },
-    position: {
-        type: Number,
-        required: true,
-        index: true
+    completed: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true })
 
