@@ -5,19 +5,18 @@ const categorySchema = new Schema({
     name: {
         type: String,
         required: true,
+        unique: true,
         index: true,
         trim: true
     },
     description: {
         type: String,
         trim: true,
-        required: true,
-        validate: {
-            validator: function (v) {
-                return v.trim().split(/\s+/).length <= 50;
-            },
-            message: props => `Description exceeds 50 words! You entered "${props.value}".`
-        }
+        required: true
+    },
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: "user"
     }
 }, { timestamps: true })
 

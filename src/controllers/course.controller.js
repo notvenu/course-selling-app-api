@@ -18,7 +18,7 @@ const createCourse = asyncHandler(async (req, res) => {
     }
     const existingCategory = await Category.find({ name: category.trim() })
     if(!existingCategory || existingCategory.length === 0){
-        throw new apiError(404, "Category not found.Create a new category first or select other as category.")
+        throw new apiError(404, "Category not found. Create a new category first or select other as category.")
     }
     const user = await User.findById(req.user?._id)
     if(!user){
@@ -146,7 +146,7 @@ const updateCourseDetails = asyncHandler(async (req, res) => {
         throw new apiError(400, "Invalid course id.")
     }
     const { title, description, price, category } = req.body
-    if(!(title || description || price || category)){
+    if(!(title.trim() || description.trim() || price.trim() || category.trim())){
         throw new apiError(400, "At least one field is required to update the course.")
     }
     const descriptionRegeX = /^[a-zA-Z0-9\s.,!?'"-]{0,150}$/
@@ -172,10 +172,10 @@ const updateCourseDetails = asyncHandler(async (req, res) => {
         course._id,
         {
             $set: {
-                ...(title && { title }),
-                ...(description && { description }),
-                ...(price && { price }),
-                ...(category && { category })
+                ...(title.trim() && { title }),
+                ...(description.trim() && { description }),
+                ...(price.trim() && { price }),
+                ...(existingCategory._id && { category })
             }
         },
         { new: true }
